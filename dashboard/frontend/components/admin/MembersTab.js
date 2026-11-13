@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import MemberForm from "@/components/admin/MemberForm";
+import ConfirmModal from "@/components/ConfirmModal";
 import Photo from "@/components/Photo";
 import { fmtDateIST, fmtDateTimeIST } from "@/lib/ist";
 
@@ -14,6 +15,7 @@ export default function MembersTab({ filter, onOpen, refreshKey }) {
   const [data, setData] = useState({ total: 0, items: [] });
   const [err, setErr] = useState("");
   const [form, setForm] = useState(filter?.add ? "" : null); // null | "" (add) | member id (edit)
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const size = 20;
 
   const load = useCallback(() => {
@@ -26,7 +28,7 @@ export default function MembersTab({ filter, onOpen, refreshKey }) {
   const set = (k) => (e) => { setF({ ...f, [k]: e.target.value }); setPage(1); };
   const pages = Math.max(1, Math.ceil(data.total / size));
   const remove = async (m) => {
-    if (!confirm(`Delete ${m.name} (${m.member_id}) permanently? Their photos, interests and chats are removed too.`)) return;
+    setDeleteTarget(null);
     try { await api(`/admin/members/${m.member_id}`, { method: "DELETE" }); load(); } catch (e) { setErr(e.message); }
   };
 
@@ -63,18 +65,29 @@ export default function MembersTab({ filter, onOpen, refreshKey }) {
                 <td className="muted">{fmtDateTimeIST(m.updated_at)}</td>
                 <td onClick={(e) => e.stopPropagation()} style={{ whiteSpace: "nowrap" }}>
                   <button className="btn small ghost" onClick={() => setForm(m.member_id)}>Edit</button>{" "}
-                  <button className="btn small danger" onClick={() => remove(m)}>Delete</button>
+                  <button className="btn small danger" onClick={() => setDeleteTarget(m)}>Delete</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <div className="row" style={{ marginTop: 12 }}>
+      <div className="row pager" style={{ marginTop: 12 }}>
         <button className="btn small ghost" disabled={page <= 1} onClick={() => setPage(page - 1)}>← Prev</button>
         <span className="muted">Page {page} of {pages}</span>
         <button className="btn small ghost" disabled={page >= pages} onClick={() => setPage(page + 1)}>Next →</button>
       </div>
+      {deleteTarget && (
+        <ConfirmModal
+          title="Delete Member"
+          message={`Delete ${deleteTarget.name} (${deleteTarget.member_id}) permanently? Their photos, interests and chats are removed too.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+          danger
+          onCancel={() => setDeleteTarget(null)}
+          onConfirm={() => remove(deleteTarget)}
+        />
+      )}
     </>
   );
 }

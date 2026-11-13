@@ -68,20 +68,26 @@ export default function Admin() {
           </div>
         </header>
 
-        <div className={view === "dashboard" ? "content with-rail" : "content"}>
-          <div className="primary">
-            {view !== "dashboard" && <h2 className="page-title">{TITLES[view]}</h2>}
-            {err && <div className="msg err">{err}</div>}
-            {view === "dashboard" && <DashboardHome dash={dash} months={months} setMonths={setMonths} onOpen={setOpen} go={navigate} />}
-            {MEMBER_VIEWS[view] && <MembersTab key={`${view}-${filter?._n}`} filter={filter} onOpen={setOpen} refreshKey={tick} />}
-            {view === "matches" && <MatchesTab onOpen={setOpen} refreshKey={tick} />}
-            {view === "photos" && <PhotosTab onOpen={setOpen} onChanged={changed} refreshKey={tick} />}
-            {view === "reports" && <ReportsTab onOpen={setOpen} onChanged={changed} refreshKey={tick} />}
-            {view === "enquiries" && <EnquiriesTab />}
-            {view === "audit" && <AuditTab />}
-            {view === "settings" && <SettingsTab user={user} />}
-          </div>
-          {view === "dashboard" && <ActivityPanel items={dash?.activities} onOpen={setOpen} />}
+        <div className="content">
+          {view !== "dashboard" && <h2 className="page-title">{TITLES[view]}</h2>}
+          {err && <div className="msg err">{err}</div>}
+          {view === "dashboard" && (
+            <DashboardHome
+              dash={dash}
+              months={months}
+              setMonths={setMonths}
+              onOpen={setOpen}
+              go={navigate}
+              rail={<ActivityPanel items={dash?.activities} onOpen={setOpen} />}
+            />
+          )}
+          {MEMBER_VIEWS[view] && <MembersTab key={`${view}-${filter?._n}`} filter={filter} onOpen={setOpen} refreshKey={tick} />}
+          {view === "matches" && <MatchesTab onOpen={setOpen} refreshKey={tick} />}
+          {view === "photos" && <PhotosTab onOpen={setOpen} onChanged={changed} refreshKey={tick} />}
+          {view === "reports" && <ReportsTab onOpen={setOpen} onChanged={changed} refreshKey={tick} />}
+          {view === "enquiries" && <EnquiriesTab />}
+          {view === "audit" && <AuditTab />}
+          {view === "settings" && <SettingsTab user={user} />}
         </div>
       </div>
 

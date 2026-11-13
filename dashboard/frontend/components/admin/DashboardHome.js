@@ -15,7 +15,7 @@ function Change({ value }) {
   return <span className={`chg ${up ? "up" : "down"}`}>{up ? "▲" : "▼"} {Math.abs(value)}% this month</span>;
 }
 
-export default function DashboardHome({ dash, months, setMonths, onOpen, go, name = "Admin" }) {
+export default function DashboardHome({ dash, months, setMonths, onOpen, go, rail, name = "Admin" }) {
   if (!dash) return <p className="muted">Loading…</p>;
   const stats = [
     ["Total members", "users", dash.total_members, "ic-green"],
@@ -24,48 +24,53 @@ export default function DashboardHome({ dash, months, setMonths, onOpen, go, nam
   ];
   return (
     <>
-      <section className="hello">
-        <Icon name="sun" size={34} />
-        <div>
-          <h2>{greeting()}, {name}</h2>
-          <p>Here is what is happening on your Cedar Matrimony platform today.</p>
-        </div>
-        <div className="hello-verse">“God has a plan for every couple.”</div>
-      </section>
-
-      {dash.pending_review > 0 && (
-        <button className="attention" onClick={() => go("registrations")}>
-          <Icon name="userPlus" size={18} /> {dash.pending_review} profile{dash.pending_review > 1 ? "s" : ""} waiting for your review <span>Review now →</span>
-        </button>
-      )}
-
-      <div className="stats">
-        {stats.map(([label, icon, s, cls]) => (
-          <div className="stat-card" key={label}>
-            <span className={`stat-ico ${cls}`}><Icon name={icon} size={22} /></span>
+      <div className="dash-top with-rail">
+        <div className="primary">
+          <section className="hello">
+            <Icon name="sun" size={34} />
             <div>
-              <div className="muted">{label}</div>
-              <div className="stat-num">{s.value.toLocaleString()}</div>
-              <Change value={s.change} />
+              <h2>{greeting()}, {name}</h2>
+              <p>Here is what is happening on your Cedar Matrimony platform today.</p>
+            </div>
+            <div className="hello-verse">“God has a plan for every couple.”</div>
+          </section>
+
+          {dash.pending_review > 0 && (
+            <button className="attention" onClick={() => go("registrations")}>
+              <Icon name="userPlus" size={18} /> {dash.pending_review} profile{dash.pending_review > 1 ? "s" : ""} waiting for your review <span>Review now →</span>
+            </button>
+          )}
+
+          <div className="stats">
+            {stats.map(([label, icon, s, cls]) => (
+              <div className="stat-card" key={label}>
+                <span className={`stat-ico ${cls}`}><Icon name={icon} size={22} /></span>
+                <div>
+                  <div className="muted">{label}</div>
+                  <div className="stat-num">{s.value.toLocaleString()}</div>
+                  <Change value={s.change} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="two">
+            <div className="panel">
+              <div className="panel-head">
+                <h3><Icon name="trend" size={18} /> Member growth</h3>
+                <select value={months} onChange={(e) => setMonths(Number(e.target.value))} style={{ width: "auto" }} aria-label="Growth range">
+                  <option value={6}>Last 6 months</option><option value={12}>Last 12 months</option>
+                </select>
+              </div>
+              <GrowthChart data={dash.growth} />
+            </div>
+            <div className="panel">
+              <div className="panel-head"><h3><Icon name="users" size={18} /> Gender distribution</h3></div>
+              <GenderDonut male={dash.gender.male} female={dash.gender.female} />
             </div>
           </div>
-        ))}
-      </div>
-
-      <div className="two">
-        <div className="panel">
-          <div className="panel-head">
-            <h3><Icon name="trend" size={18} /> Member growth</h3>
-            <select value={months} onChange={(e) => setMonths(Number(e.target.value))} style={{ width: "auto" }} aria-label="Growth range">
-              <option value={6}>Last 6 months</option><option value={12}>Last 12 months</option>
-            </select>
-          </div>
-          <GrowthChart data={dash.growth} />
         </div>
-        <div className="panel">
-          <div className="panel-head"><h3><Icon name="users" size={18} /> Gender distribution</h3></div>
-          <GenderDonut male={dash.gender.male} female={dash.gender.female} />
-        </div>
+        {rail}
       </div>
 
       <div className="two wide-left">
@@ -76,7 +81,7 @@ export default function DashboardHome({ dash, months, setMonths, onOpen, go, nam
           </div>
           <div className="tablewrap flat">
             <table className="table recent">
-              <thead><tr><th>Name</th><th>Age</th><th>Location</th><th>Joined On</th><th>Modified On (IST)</th><th>Status</th></tr></thead>
+              <thead><tr><th>Name</th><th>Age</th><th>Location</th><th>Status</th><th>Joined On</th><th>Modified On (IST)</th></tr></thead>
               <tbody>
                 {dash.recent_members.length === 0 && <tr><td colSpan={6} className="muted">No members yet.</td></tr>}
                 {dash.recent_members.map((m) => (
@@ -84,9 +89,9 @@ export default function DashboardHome({ dash, months, setMonths, onOpen, go, nam
                     <td><span className="who">{m.photo_id || m.photo_url ? <Photo id={m.photo_id} url={m.photo_url} size={32} alt={m.name} /> : <span className="ini">{initials(m.name)}</span>}<strong>{m.name}</strong></span></td>
                     <td>{m.age}</td>
                     <td>{m.location || "—"}</td>
+                    <td><span className={`pill ${m.approval_status}`}>{STATUS[m.approval_status] || m.approval_status}</span></td>
                     <td className="muted">{fmtDateIST(m.created_at)}</td>
                     <td className="muted">{fmtDateTimeIST(m.updated_at)}</td>
-                    <td><span className={`pill ${m.approval_status}`}>{STATUS[m.approval_status] || m.approval_status}</span></td>
                   </tr>
                 ))}
               </tbody>

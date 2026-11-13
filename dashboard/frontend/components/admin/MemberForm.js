@@ -40,7 +40,7 @@ const BLANK = { registering_for: "Self", country: "India", mother_tongue: "Telug
 const NUM = new Set(["height_cm", "siblings", "months", "pref_age_min", "pref_age_max"]);
 const REQUIRED_ALWAYS = ["first_name", "last_name", "date_of_birth"];
 
-// Add (memberId empty) or edit one member. Opens as a side drawer.
+// Add (memberId empty) or edit one member. Opens as a centered modal popup.
 export default function MemberForm({ memberId, onClose, onSaved }) {
   const edit = !!memberId;
   const [v, setV] = useState(edit ? null : BLANK);
@@ -79,9 +79,9 @@ export default function MemberForm({ memberId, onClose, onSaved }) {
   };
 
   return (
-    <div className="drawer-wrap" style={{ zIndex: 60 }}>
+    <div className="drawer-wrap modal-wrap" style={{ zIndex: 60 }}>
       <div className="drawer-backdrop" onClick={onClose} />
-      <form className="drawer" onSubmit={submit}>
+      <form className="drawer modal-box" onSubmit={submit}>
         <div className="row between">
           <h3 style={{ margin: 0 }}>{edit ? `Edit ${memberId}` : "Add member"}</h3>
           <button type="button" className="btn small ghost" onClick={onClose}>✕ Close</button>

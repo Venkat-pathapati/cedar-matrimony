@@ -114,7 +114,7 @@ export function AuditTab() {
           </tbody>
         </table>
       </div>
-      <div className="row" style={{ marginTop: 12 }}>
+      <div className="row pager" style={{ marginTop: 12 }}>
         <button className="btn small ghost" disabled={page <= 1} onClick={() => setPage(page - 1)}>← Newer</button>
         <span className="muted">Page {page}</span>
         <button className="btn small ghost" disabled={rows.length < 50} onClick={() => setPage(page + 1)}>Older →</button>
@@ -151,7 +151,7 @@ export function EnquiriesTab() {
           <button className="btn small danger" onClick={() => del(m.id)}>Delete</button>
         </div>
       ))}
-      <div className="row" style={{ marginTop: 12 }}>
+      <div className="row pager" style={{ marginTop: 12 }}>
         <button className="btn small ghost" disabled={page <= 1} onClick={() => setPage(page - 1)}>← Prev</button>
         <span className="muted">Page {page} of {pages}</span>
         <button className="btn small ghost" disabled={page >= pages} onClick={() => setPage(page + 1)}>Next →</button>
